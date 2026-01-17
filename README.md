@@ -1,37 +1,20 @@
-# Skill Intelligence System 
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-A smart web platform that analyzes a student's skills,
-identifies gaps, and generates a personalized learning roadmap.
+# Run and deploy your AI Studio app
 
-##  Problem Statement
-Holistic Academic & Professional Skill Intelligence System
+This contains everything you need to run your app locally.
 
-##  Target Users
-- College students (15–19)
-- Extendable up to 25
+View your app in AI Studio: https://ai.studio/apps/drive/1J9OfI0BiMBkyYmq1Xhdv59Ej5wfgqq6C
 
-##  Features
-- Skill gap analysis
-- Personalized roadmap
-- Daily progress tracking
-- Sector‑based guidance
+## Run Locally
 
-##  Tech Stack
-- HTML
-- CSS
-- JavaScript
+**Prerequisites:**  Node.js
 
-##  Project Stages
-- Stage 1: Website skeleton & UI
-- Stage 2: User assessment system
-- Stage 3: Intelligence engine
-- Stage 4: Progress tracking
-- Stage 5: UI polish
-- Stage 6: Presentation
 
-##  Team
-- Bhavy Patel
-- Nisarg Patel
-- Devam Patel
-- Vyomesh Patel
-- Rudraksh Prajapati
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
