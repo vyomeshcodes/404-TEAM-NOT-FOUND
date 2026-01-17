@@ -3,24 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>Sign Up | Planify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-<div class="auth-container">
-    <h2>Create Account</h2>
+<!-- Navbar (same as index) -->
+<nav class="navbar">
+    <div class="container nav-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <i data-lucide="zap"></i>
+            </div>
+            <span class="logo-text">Planify</span>
+        </div>
 
-    <form method="POST" action="/signup">
-        <input type="text" name="identifier" placeholder="Email or Phone Number" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <div class="nav-buttons">
+            <a href="{{ url_for('login') }}" class="btn btn-ghost">Log In</a>
+        </div>
+    </div>
+</nav>
 
-        <button type="submit" class="btn btn-primary">Sign Up</button>
-    </form>
+<!-- Auth Section -->
+<main class="hero">
+    <div class="container">
+        <div class="hero-content" style="max-width: 400px; margin: auto;">
+            <h1 class="hero-title">Create your account</h1>
 
-    <p>Already have an account?
-        <a href="/login">Login</a>
-    </p>
-</div>
+            <form method="POST" action="{{ url_for('signup') }}">
+                <input type="email" name="email" placeholder="Email address" required>
+
+                <input type="password" name="password" placeholder="Create password" required>
+
+                <input type="password" name="confirm_password" placeholder="Confirm password" required>
+
+                <button type="submit" class="btn btn-primary btn-lg shadow" style="width:100%;">
+                    Sign Up
+                </button>
+            </form>
+
+            <p style="margin-top: 16px; text-align:center;">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Log in</a>
+            </p>
+        </div>
+    </div>
+</main>
+
+<script>
+    lucide.createIcons();
+</script>
 
 </body>
 </html>
