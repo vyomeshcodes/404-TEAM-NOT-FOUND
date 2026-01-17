@@ -7,22 +7,19 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 export const generatePersonalizedRoadmap = async (profile: UserProfile): Promise<SkillGapAnalysis> => {
   const prompt = `
     Act as a senior career mentor and industry expert in ${profile.sector}.
-    Analyze the following student profile and generate a 4-week personalized learning roadmap to reach their specific goal.
+    Analyze the following student profile and generate a 4-week high-impact learning roadmap.
     
     User Profile:
-    - Name: ${profile.name}
-    - Specific Goal: ${profile.goal}
+    - Goal: ${profile.goal}
     - Current Skills: ${profile.skills.join(', ')}
-    - Certificates: ${profile.certificates.join(', ')}
-    - Target Sector: ${profile.sector}
-    - Proficiency Level: ${profile.level}
-    - Availability: ${profile.studyHoursPerDay} hours/day
+    - Level: ${profile.level}
     
     Tasks:
-    1. Identify critical missing skills for this sector and goal.
-    2. Provide a structured 4-week plan.
-    3. Calculate a "Readiness Score" (0-100) based on their current skills vs. the target goal.
-    4. Provide a "Baseline Score" which represents a typical student who hasn't started yet (usually 5-10).
+    1. Identify skill gaps.
+    2. Provide a 4-week roadmap.
+    3. For EACH week, suggest 2 realistic video course titles (e.g., from Coursera/Udemy/YouTube).
+    4. Provide 2-3 specific project ideas to build a portfolio.
+    5. Calculate scores.
   `;
 
   const response = await ai.models.generateContent({
@@ -33,13 +30,8 @@ export const generatePersonalizedRoadmap = async (profile: UserProfile): Promise
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          missingSkills: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-          },
-          recommendation: {
-            type: Type.STRING,
-          },
+          missingSkills: { type: Type.ARRAY, items: { type: Type.STRING } },
+          recommendation: { type: Type.STRING },
           roadmap: {
             type: Type.ARRAY,
             items: {
@@ -49,22 +41,38 @@ export const generatePersonalizedRoadmap = async (profile: UserProfile): Promise
                 topic: { type: Type.STRING },
                 description: { type: Type.STRING },
                 resources: { type: Type.ARRAY, items: { type: Type.STRING } },
-                tasks: { type: Type.ARRAY, items: { type: Type.STRING } }
+                tasks: { type: Type.ARRAY, items: { type: Type.STRING } },
+                suggestedCourses: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      title: { type: Type.STRING },
+                      platform: { type: Type.STRING },
+                      url: { type: Type.STRING },
+                      thumbnail: { type: Type.STRING }
+                    },
+                    required: ["title", "platform"]
+                  }
+                }
               },
-              required: ["week", "topic", "description", "resources", "tasks"]
+              required: ["week", "topic", "description", "tasks", "suggestedCourses"]
             }
           },
-          projectIdea: {
-            type: Type.STRING,
+          projectIdea: { type: Type.STRING },
+          featuredProjects: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                difficulty: { type: Type.STRING },
+                description: { type: Type.STRING }
+              }
+            }
           },
-          readinessScore: {
-            type: Type.NUMBER,
-            description: "How ready the user is for their goal (0-100)."
-          },
-          baselineScore: {
-            type: Type.NUMBER,
-            description: "A comparison score for someone starting from scratch (usually 0-10)."
-          }
+          readinessScore: { type: Type.NUMBER },
+          baselineScore: { type: Type.NUMBER }
         },
         required: ["missingSkills", "recommendation", "roadmap", "projectIdea", "readinessScore", "baselineScore"]
       }
@@ -72,11 +80,9 @@ export const generatePersonalizedRoadmap = async (profile: UserProfile): Promise
   });
 
   try {
-    const text = response.text;
-    if (!text) throw new Error("Empty response from AI");
-    return JSON.parse(text) as SkillGapAnalysis;
+    return JSON.parse(response.text || '{}') as SkillGapAnalysis;
   } catch (error) {
     console.error("Failed to parse AI response", error);
-    throw new Error("AI analysis failed. Please try again.");
+    throw new Error("AI analysis failed.");
   }
 };
