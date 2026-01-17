@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { db } from '../services/dbService';
 
 interface AuthProps {
   onAuthSuccess: (email: string) => void;
@@ -10,63 +11,87 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      setIsAuthenticating(true);
-      // Simulate network request
-      setTimeout(() => {
-        setIsAuthenticating(false);
-        onAuthSuccess(email);
-      }, 1200);
-    } else {
-      alert('Please fill in both email and password.');
+    setError('');
+    
+    if (!email || !password) {
+      setError('Required fields missing');
+      return;
     }
+
+    setIsAuthenticating(true);
+    
+    // Simulate network delay
+    setTimeout(() => {
+      if (isLogin) {
+        if (db.login(email, password)) {
+          onAuthSuccess(email);
+        } else {
+          setError('Invalid email or password');
+          setIsAuthenticating(false);
+        }
+      } else {
+        if (db.signup(email, password)) {
+          onAuthSuccess(email);
+        } else {
+          setError('User already exists');
+          setIsAuthenticating(false);
+        }
+      }
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative blobs */}
-      <div className="absolute top-0 -left-10 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
-      <div className="absolute bottom-0 -right-10 w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-blue-100/40 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-indigo-100/40 rounded-full blur-[120px]"></div>
 
-      <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white relative z-10">
+      <div className="max-w-md w-full space-y-8 bg-white/70 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-white/50 relative z-10 transition-all duration-500">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg mb-6">
-            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <div className="inline-flex items-center justify-center p-5 bg-gradient-to-tr from-blue-600 to-indigo-700 rounded-3xl shadow-xl shadow-blue-200 mb-8 transform hover:scale-110 transition-transform">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-            {isLogin ? 'Welcome Back' : 'Get Started'}
+          <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-2">
+            {isLogin ? 'Welcome Back' : 'Join Planify'}
           </h2>
-          <p className="mt-3 text-slate-500 font-medium">
-            Planify your career with AI intelligence.
+          <p className="text-slate-500 font-medium">
+            AI-Driven Career Intelligence for Modern Sectors
           </p>
         </div>
 
-        <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-5">
-            <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Email Address</label>
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold border border-red-100 animate-shake">
+            {error}
+          </div>
+        )}
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="group">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Email Address</label>
               <input
                 type="email"
                 required
                 disabled={isAuthenticating}
-                className="block w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all outline-none font-medium"
+                className="block w-full px-6 py-4 bg-slate-50/50 border border-slate-200/60 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-300"
                 placeholder="alex@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Password</label>
+            <div className="group">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Secure Password</label>
               <input
                 type="password"
                 required
                 disabled={isAuthenticating}
-                className="block w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all outline-none font-medium"
+                className="block w-full px-6 py-4 bg-slate-50/50 border border-slate-200/60 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-300"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -74,43 +99,30 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center">
-              <input id="remember-me" type="checkbox" className="h-4 w-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500" />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-500 font-medium">Remember me</label>
-            </div>
-            {isLogin && (
-              <a href="#" className="text-sm font-bold text-blue-600 hover:text-blue-500">Forgot password?</a>
-            )}
-          </div>
-
           <button
             type="submit"
             disabled={isAuthenticating}
-            className="w-full flex justify-center py-5 px-4 rounded-2xl shadow-xl text-lg font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full flex justify-center py-5 px-6 rounded-[1.25rem] shadow-xl shadow-blue-100 text-lg font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all transform active:scale-[0.97] disabled:opacity-70"
           >
             {isAuthenticating ? (
               <div className="flex items-center gap-3">
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {isLogin ? 'Signing In...' : 'Registering...'}
+                <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Processing...
               </div>
             ) : (
-              isLogin ? 'Sign In to Planify' : 'Create My Account'
+              isLogin ? 'Sign In to Dashboard' : 'Create My Account'
             )}
           </button>
         </form>
 
-        <div className="text-center pt-4">
+        <div className="text-center pt-2">
           <button
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => { setIsLogin(!isLogin); setError(''); }}
             disabled={isAuthenticating}
-            className="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors"
+            className="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors py-2"
           >
-            {isLogin ? "New to Planify? " : 'Already have an account? '}
-            <span className="text-blue-600">{isLogin ? 'Sign up for free' : 'Log in here'}</span>
+            {isLogin ? "Don't have an account? " : 'Already a member? '}
+            <span className="text-blue-600 underline underline-offset-4">{isLogin ? 'Sign up free' : 'Log in here'}</span>
           </button>
         </div>
       </div>

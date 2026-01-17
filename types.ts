@@ -11,6 +11,19 @@ export enum SkillLevel {
   ADVANCED = 'Advanced'
 }
 
+export interface Course {
+  title: string;
+  platform: string;
+  url: string;
+  thumbnail: string;
+}
+
+export interface Project {
+  title: string;
+  difficulty: string;
+  description: string;
+}
+
 export interface UserProfile {
   name: string;
   goal: string;
@@ -27,6 +40,7 @@ export interface RoadmapStep {
   description: string;
   resources: string[];
   tasks: string[];
+  suggestedCourses: Course[];
 }
 
 export interface SkillGapAnalysis {
@@ -34,6 +48,7 @@ export interface SkillGapAnalysis {
   recommendation: string;
   roadmap: RoadmapStep[];
   projectIdea: string;
-  readinessScore: number; // 0-100 score
-  baselineScore: number; // Comparison score for a total beginner
+  featuredProjects: Project[];
+  readinessScore: number;
+  baselineScore: number;
 }
