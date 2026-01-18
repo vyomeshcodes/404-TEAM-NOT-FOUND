@@ -1,0 +1,8 @@
+{
+  "name": "Stratum AI 2.0",
+  "description": "A world-class AI Career Intelligence platform designed for Healthcare Tech, AgriTech, and Smart City professionals. Featuring skill gap analysis, portfolio building, and AI mentorship.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
